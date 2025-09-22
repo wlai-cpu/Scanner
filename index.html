@@ -1,4 +1,6 @@
-
+<!DOCTYPE html>
+<html>
+<head>
   <meta charset="utf-8">
   <title>QR Code 掃描器</title>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
@@ -9,18 +11,26 @@
   <p>掃描結果：<span id="result"></span></p>
 
   <script>
-    const apiUrl = "https://script.google.com/a/macros/andst.co.jp/s/AKfycbyz2IaF6C2NSZls15e5PLqSLFiqWY8oqIVlQF32UOUlFUF45Vom6OjfcLtQa6bvWoHt/exec"; // 換成你的 Apps Script 網址
+    // 這裡換成你的 Apps Script Web App URL
+    const apiUrl = "https://script.google.com/a/macros/andst.co.jp/s/AKfycbyz2IaF6C2NSZls15e5PLqSLFiqWY8oqIVlQF32UOUlFUF45Vom6OjfcLtQa6bvWoHt/exec";
 
     function onScanSuccess(qrMessage) {
       document.getElementById("result").innerText = qrMessage;
 
       fetch(apiUrl, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ qr: qrMessage })
       })
       .then(res => res.text())
-      .then(txt => console.log("回應:", txt))
-      .catch(err => console.error(err));
+      .then(txt => {
+        console.log("伺服器回應:", txt);
+        alert("伺服器回應: " + txt); // 方便測試
+      })
+      .catch(err => {
+        console.error("錯誤:", err);
+        alert("傳送失敗: " + err);
+      });
     }
 
     let html5QrCode = new Html5Qrcode("reader");
@@ -32,6 +42,7 @@
           onScanSuccess
         );
       }
-    }).catch(err => console.error(err));
+    }).catch(err => console.error("相機錯誤:", err));
   </script>
 </body>
+</html>
